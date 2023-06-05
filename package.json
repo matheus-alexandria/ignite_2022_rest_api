@@ -10,9 +10,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@rocketseat/eslint-config": "^1.2.0",
     "@types/node": "^20.2.5",
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
     "eslint": "^8.42.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
     "tsx": "^3.12.7",
     "typescript": "^5.1.3"
   },
