@@ -2,16 +2,13 @@ import crypto, { randomUUID } from 'node:crypto';
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { knex } from '../database';
+import { checkSessionIdExists } from '../middlewares/checkSessionIdExists';
 
 export async function transactionsRoutes(server: FastifyInstance) {
-  server.get('/', async (request, reply) => {
+  server.get('/', {
+    preHandler: [checkSessionIdExists],
+  }, async (request) => {
     const sessionId = request.cookies;
-
-    if (!sessionId) {
-      return reply.status(401).send({
-        error: 'Unauthorized.',
-      });
-    }
 
     const transactions = await knex('transactions')
       .where('session_id', sessionId)
@@ -22,7 +19,11 @@ export async function transactionsRoutes(server: FastifyInstance) {
     };
   });
 
-  server.get('/:id', async (request) => {
+  server.get('/:id', {
+    preHandler: [checkSessionIdExists],
+  }, async (request) => {
+    const { sessionId } = request.cookies;
+
     const getTransactionParamsSchema = z.object({
       id: z.string().uuid(),
     });
@@ -30,7 +31,7 @@ export async function transactionsRoutes(server: FastifyInstance) {
     const { id } = getTransactionParamsSchema.parse(request.params);
 
     const transaction = await knex('transactions')
-      .where('id', id)
+      .where({ id, session_id: sessionId })
       .first();
 
     return {
@@ -38,8 +39,14 @@ export async function transactionsRoutes(server: FastifyInstance) {
     };
   });
 
-  server.get('/summary', async () => {
-    const summary = await knex('transactions').sum('amount', { as: 'amount' }).first();
+  server.get('/summary', {
+    preHandler: [checkSessionIdExists],
+  }, async (request) => {
+    const { sessionId } = request.cookies;
+    const summary = await knex('transactions')
+      .where('session_id', sessionId)
+      .sum('amount', { as: 'amount' })
+      .first();
 
     return {
       summary,
