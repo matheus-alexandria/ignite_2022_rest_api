@@ -1,15 +1,5 @@
-import fastify from 'fastify';
-import cookie from '@fastify/cookie';
 import { env } from './env';
-import { transactionsRoutes } from './routes/transactions';
-
-const server = fastify();
-
-server.register(cookie);
-
-server.register(transactionsRoutes, {
-  prefix: 'transactions',
-});
+import { server } from './initFastifyServer';
 
 server.listen({ port: env.PORT }, () => {
   console.log('HTTP Server Online!');
