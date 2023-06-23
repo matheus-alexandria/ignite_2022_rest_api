@@ -1,7 +1,8 @@
 import {
-  afterAll, beforeAll, expect, describe, it,
+  afterAll, beforeAll, expect, describe, it, beforeEach,
 } from 'vitest';
 import request from 'supertest';
+import { execSync } from 'child_process';
 import { server } from '../initFastifyServer';
 
 describe('Transactions routes', () => {
@@ -11,6 +12,11 @@ describe('Transactions routes', () => {
 
   afterAll(async () => {
     await server.close();
+  });
+
+  beforeEach(async () => {
+    execSync('npm run knex migrate:rollback --all');
+    execSync('npm run knex migrate:latest');
   });
 
   it('should be able to create a new transaction', async () => {
