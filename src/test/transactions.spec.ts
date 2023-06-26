@@ -46,8 +46,6 @@ describe('Transactions routes', () => {
       .get('/transactions')
       .set('Cookie', cookies);
 
-    console.log(createTransactionResponse.status);
-
     expect(listTransactionsResponse.body.transactions).toEqual([
       expect.objectContaining({
         title: 'New transaction',
@@ -85,5 +83,35 @@ describe('Transactions routes', () => {
         amount: 5000,
       }),
     );
+  });
+
+  it.only('should be able to get summary', async () => {
+    const createTransactionResponse = await request(server.server)
+      .post('/transactions')
+      .send({
+        title: 'New transaction',
+        amount: 5000,
+        type: 'credit',
+      });
+
+    const cookies = createTransactionResponse.get('Set-Cookie');
+
+    await request(server.server)
+      .post('/transactions')
+      .set('Cookie', cookies)
+      .send({
+        title: 'New payment',
+        amount: 2000,
+        type: 'debit',
+      });
+
+    const getSummaryResponse = await request(server.server)
+      .get('/transactions/summary')
+      .set('Cookie', cookies)
+      .expect(200);
+
+    expect(getSummaryResponse.body.summary).toEqual({
+      amount: 3000,
+    });
   });
 });
