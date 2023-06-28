@@ -3,7 +3,7 @@ import {
 } from 'vitest';
 import request from 'supertest';
 import { execSync } from 'child_process';
-import { server } from '../initFastifyServer';
+import { server } from '../src/initFastifyServer';
 
 describe('Transactions routes', () => {
   beforeAll(async () => {
@@ -85,7 +85,7 @@ describe('Transactions routes', () => {
     );
   });
 
-  it.only('should be able to get summary', async () => {
+  it('should be able to get summary', async () => {
     const createTransactionResponse = await request(server.server)
       .post('/transactions')
       .send({
